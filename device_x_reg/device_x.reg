@@ -24,7 +24,7 @@
  * desc : description string for this device.
  *
  */
-DEV(PHY_88E154x, 0xdeadbeef, 88E154x, "Marvell Ethernet PHY 88E154x")
+DEV(DEV_TEST, 0xdeadbeef, DEV_X, "DUMMY Device X to demo the device register desciption infra")
 
 /*
  * Register :

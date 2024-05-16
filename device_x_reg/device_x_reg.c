@@ -7,10 +7,10 @@
 
 #include "reg_desc_tbl.h"
 
-//#include "device_x_reg.h"
+#define DEV_REG_FILE "device_x.reg"
+#include "reg_file_to_desc_tbl.h"
 
-//#define DEV_REG "device_x.reg"
-
+#if 0
 #define DEFINE_FLD_OPTS
 #include "device_x.reg"
 
@@ -21,8 +21,8 @@
 #include "device_x.reg"
 
 #define DEFINE_REGS_DESC_TBL
-#define DEV_REGS_TBL_NAME test
 #include "device_x.reg"
+#endif
 
 int main (int argc, char *argv[])
 {
@@ -30,17 +30,9 @@ int main (int argc, char *argv[])
     struct reg_desc *reg;
     uint32_t reg_idx;
 
-    tbl = &reg_desc_tbl_test;
+    tbl = &reg_desc_tbl_DEV_TEST;
 
-
-    printf("DEVICE: %s:%s\n", tbl->n, tbl->short_n);
-    printf("\t%s\n", tbl->desc);
-    printf("\n");
-    reg = tbl->regs;
-    for (reg_idx = 0; reg_idx < tbl->cnt; reg_idx++) {
-        printf("REG[%d %s]:%s\n", reg_idx, reg->short_n, reg->n);
-        reg++;
-    }
+    reg_desc_tbl_dump(tbl);
 
    return 0;
 
