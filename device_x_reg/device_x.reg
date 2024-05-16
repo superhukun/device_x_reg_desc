@@ -1,0 +1,75 @@
+/*
+ * Author: Ken Hu
+ * Date: 2024-05-16
+ */
+
+#include "reg_desc_hlper.h"
+
+/*
+ * REG: REGister
+ * FLD: FieLD of register
+ * OPT: OPTional value of a FLD.
+ *
+ * A REG() must be followed by at least one FLD(),  and
+ * a FLD() must be followed by at least one OPT().
+ */
+
+/*
+ * Device :
+ * DEV(name, resv, abbr, desc)
+
+ * name : the literal name for the device for those registers, eg, PHY_Marvell_88E154x.
+ * resv : reserved
+ * abbr : mnemonic abbreviation for this device, eg, 88E154x
+ * desc : description string for this device.
+ *
+ */
+DEV(PHY_88E154x, 0xdeadbeef, 88E154x, "Marvell Ethernet PHY 88E154x")
+
+/*
+ * Register :
+ * REG(name, loc, abbr, desc)
+ *
+ * name : the literal name for this register, eg, GEN_CTRL1, genCtrl1.
+ * loc  : uint32 integer, location id of this register, might be id/address (in-direct access), or offset address(mem mapped direct access)
+ * abbr : mnemonic abbreviation for this register, eg, GCT
+ * desc : description string for this register.
+ *
+ */
+REG(GEN_CTRL1, 0x12345, GCT, "Generic control register")
+
+/*
+ * Field of a Register:
+ * FLD(name, msk, abbr, desc)
+ *
+ * name : the literal name for this register, eg, GEN_CTRL1_RST, genCtrl1_reset.
+ *        NOTE "_MSK" will be automatically appended to create final FLD literal name.
+ * msk  : uint32 integer, the bit mask of this field of its register, eg ((0x3) << 1) bit2:1
+ * abbr : mnemonic abbreviation for this field, eg, RST
+ * desc : description string for this field.
+ *
+ */
+FLD(GEN_CTRL1_FLD1, ((0x3) << 7), FLD1, "Generic control register field 1")
+
+/*
+ * Value option of a Field of a Register:
+ * OPT(name, value, abbr, desc)
+
+ * name  : the literal name for this value, eg, GEN_CTRL1_RST, genCtrl1_reset.
+ * value : uint32 integer, the bit mask of this field of its register, eg ((0x2) << 1) bit2
+ * abbr  : mnemonic abbreviation for this field, eg, RST
+ * desc  : description string for this field.
+ *
+ */
+OPT(GEN_CTRL1_FLD1_V0, ((0x0) << 7), V0, "Generic control register V0")
+OPT(GEN_CTRL1_FLD1_V1, ((0x1) << 7), V1, "Generic control register V1")
+
+REG(GEN_CTRL2, 0x008877, GCT2, "Generic control register 2")
+FLD(GEN_CTRL2_FLD1, ((0x3) << 7), FLD1, "Generic control register field 1")
+OPT(GEN_CTRL2_FLD1_V0, ((0x0) << 7), V0, "Generic control register V0")
+FLD(GEN_CTRL2_FLD2, ((0x3) << 0), FLD2, "Generic control register field 2")
+OPT(GEN_CTRL2_FLD2_V0, ((0x0) << 0), zero, "Generic control register zero")
+OPT(GEN_CTRL2_FLD2_V1, ((0x1) << 0), one, "Generic control register test one")
+
+
+END_DEV(TEST_DEV)
