@@ -36,7 +36,7 @@ DEV(DEV_TEST, 0xdeadbeef, DEV_X, "DUMMY Device X to demo the device register des
  * desc : description string for this register.
  *
  */
-REG(GEN_CTRL1, 0x12345, GCT, "Generic control register")
+REG(FOOD_SELECT, 0x12345, FOOD_SLCT, "Register to control what food are selected")
 
 /*
  * Field of a Register:
@@ -49,7 +49,7 @@ REG(GEN_CTRL1, 0x12345, GCT, "Generic control register")
  * desc : description string for this field.
  *
  */
-FLD(GEN_CTRL1_FLD1, ((0x3) << 7), FLD1, "Generic control register field 1")
+FLD(FOOD_SLCT_FRUIT, ((0xf) << 0), FRUIT, "Select the fruit for the breakfast")
 
 /*
  * Value option of a Field of a Register:
@@ -61,15 +61,28 @@ FLD(GEN_CTRL1_FLD1, ((0x3) << 7), FLD1, "Generic control register field 1")
  * desc  : description string for this field.
  *
  */
-OPT(GEN_CTRL1_FLD1_V0, ((0x0) << 7), V0, "Generic control register V0")
-OPT(GEN_CTRL1_FLD1_V1, ((0x1) << 7), V1, "Generic control register V1")
+OPT(FOOD_SLCT_FRUIT_NONE,      ((0x0) << 0), NA, "None fruit")
+OPT(FOOD_SLCT_FRUIT_APPLE,     ((0x1) << 0), APPLE, "Apple from Shangdong YanTai.")
+OPT(FOOD_SLCT_FRUIT_CHERRY,    ((0x2) << 0), CHERRY, "Cherry from USA.")
+OPT(FOOD_SLCT_FRUIT_PINEAPPLE, ((0x3) << 0), PAPPLE, "Pineapple from Thailand.")
+OPT(FOOD_SLCT_FRUIT_ANY,       ((0xf) << 0), ANY, "Any fruit in the world.")
 
-REG(GEN_CTRL2, 0x008877, GCT2, "Generic control register 2")
-FLD(GEN_CTRL2_FLD1, ((0x3) << 7), FLD1, "Generic control register field 1")
-OPT(GEN_CTRL2_FLD1_V0, ((0x0) << 7), V0, "Generic control register V0")
-FLD(GEN_CTRL2_FLD2, ((0x3) << 0), FLD2, "Generic control register field 2")
-OPT(GEN_CTRL2_FLD2_V0, ((0x0) << 0), zero, "Generic control register zero")
-OPT(GEN_CTRL2_FLD2_V1, ((0x1) << 0), one, "Generic control register test one")
+FLD(FOOD_SLCT_DRINK,        ((0xf) << 4), DRINK, "Select the drink for the meal")
+OPT(FOOD_SLCT_DRINK_COFFEE, ((0x0) << 4), COFFEE, "Coffee from Columbia.")
+OPT(FOOD_SLCT_DRINK_WATER,  ((0x1) << 4), WATER, "Water from IceLand.")
+OPT(FOOD_SLCT_DRINK_TEA,    ((0x2) << 4), TEA, "Tea from China.")
+OPT(FOOD_SLCT_DRINK_BEER,   ((0x3) << 4), BEER, "Beer from German.")
+
+REG(GEN_BITS_CTRL, 0x008877, GCT2, "Generic bits control register ")
+FLD(GEN_CTRL2_BIT15,     ((0x1) << 15), BIT15, "BIT15 field")
+OPT(GEN_CTRL2_BIT15_CLR, ((0x0) << 15), CLR, "BIT15 clear function 15")
+OPT(GEN_CTRL2_BIT15_SET, ((0x1) << 15), SET, "BIT15 set function 15")
+FLD(GEN_CTRL2_BIT14,     ((0x1) << 14), BIT14, "BIT14 field")
+OPT(GEN_CTRL2_BIT14_CLR, ((0x0) << 14), CLR, "BIT14 clear function 14")
+OPT(GEN_CTRL2_BIT14_SET, ((0x1) << 14), SET, "BIT14 set function 14")
+FLD(GEN_CTRL2_BIT13,     ((0x1) << 13), BIT13, "BIT13 field")
+OPT(GEN_CTRL2_BIT13_CLR, ((0x0) << 13), CLR, "BIT13 clear function 13")
+OPT(GEN_CTRL2_BIT13_SET, ((0x1) << 13), SET, "BIT13 set function 13")
 
 
 END_DEV(TEST_DEV)
