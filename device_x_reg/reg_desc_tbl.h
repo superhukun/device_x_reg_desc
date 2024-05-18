@@ -7,6 +7,7 @@
 #define _REG_DESC_TBL_H_
 
 #include <stdint.h>
+#include <stddef.h>
 
 #define desc_literal_info \
     const char *n; /* name*/ \
@@ -108,14 +109,26 @@ void reg_desc_parse_reg_value(uint32_t reg_loc, uint32_t reg_value, uint32_t lkp
                               output_decorator_cb decorator,
                               void *ctx);
 
+char *msk_to_str_msb (uint32_t msk);
+
+/*Registry related struct, MACRO */
 struct reg_tbl_item {
     struct reg_desc_tbl *tbl;
     struct reg_tbl_item *next;
 };
-void submit_reg_tbl_item(struct reg_tbl_item *item);
-struct reg_desc_tbl *get_reg_desc_lkptbl(const char *tbl_name);
+void registry_reg_desc_tbl(struct reg_tbl_item *item);
+struct reg_desc_tbl *get_reg_desc_tbl_from_registry(const char *tbl_name);
 
-#define SUBMIT_REG_TBL_TO_LIST(_dev)
+#define REG_DESC_TBL_REGISTRY(_tbl) \
+static struct reg_tbl_item reg_tbl_item_##_tbl; \
+static void do_registry_reg_desc_tbl_##_tbl (void) __attribute__((constructor)); \
+static void do_registry_reg_desc_tbl_##_tbl (void) \
+{ \
+    registry_reg_desc_tbl(&reg_tbl_item_##_tbl); \
+} \
+static struct reg_tbl_item reg_tbl_item_##_tbl = { \
+    .tbl = &(_tbl), \
+    .next = NULL \
+} \
 
-char *msk_to_str_msb (uint32_t msk);
 #endif

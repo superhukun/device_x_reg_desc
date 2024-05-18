@@ -240,7 +240,6 @@ char *reg_desc_parse_result_status_str (enum parse_status st) {
     (_flg & INFO_L_DESC)?(_obj?(_obj)->desc:"Unknown"):""                  \
 
 
-//#define HEADLINE_PREFIX "[Dev/Reg/Value(lkp bits)] = "
 #define HEADLINE_PREFIX ""
 #define HEADLINE_NO_REG_LITERAL_FMT  HEADLINE_PREFIX LITERAL_INFO_FMT  "/0x%08X/0x%08x(lkp bits %s)\n"
 #define HEADLINE_FMT  HEADLINE_PREFIX "[Device:" LITERAL_INFO_FMT  "] /[Reg: 0x%08x " LITERAL_INFO_FMT "] /[Value: 0x%08x(lkp bits %s)]\n"
@@ -348,7 +347,7 @@ void reg_desc_parse_reg_value (uint32_t reg_loc, uint32_t reg_value, uint32_t lk
         /* The table doens't have the description for this register,
          *
          * if the buf is provided, we output the default output string for the parse result:
-         * {device literal string} register {HEX reg loc}: {HEX reg value}}
+         * #device literal string# register #HEX reg loc#: #HEX reg value#
          * */
         if (buf) {
             prn_rc = snprintf(buf, size,
@@ -460,30 +459,28 @@ void reg_desc_parse_reg_value (uint32_t reg_loc, uint32_t reg_value, uint32_t lk
     return;
 }
 
-//////
-//
+/*
+ * Registry APIs
+ * */
+static struct reg_tbl_item *reg_desc_tbl_registry = NULL;
 
-static struct reg_tbl_item *global_tbl_list = NULL;
-
-void submit_reg_tbl_to_list (struct reg_tbl_item *list) {
+void registry_reg_desc_tbl (struct reg_tbl_item *list) {
 
     if (!list || !list->tbl || !list->tbl->n) {
         return;
     }
 
-    if (get_reg_desc_lkptbl(list->tbl->n)) {
-        /*Duplicated name table already submitted to list*/
-        printf("%s device reg tbl already in the list.", list->tbl->n);
+    if (get_reg_desc_tbl_from_registry(list->tbl->n)) {
+        /*Duplicated name table already registry to list*/
         return;
 
     }
 
-    list->next = global_tbl_list;
-    global_tbl_list = list;
-    printf("submit %s device reg tbl to the global list.", list->tbl->n);
+    list->next = reg_desc_tbl_registry;
+    reg_desc_tbl_registry = list;
 }
 
-struct reg_desc_tbl *get_reg_desc_lkptbl (const char *tbl_name)
+struct reg_desc_tbl *get_reg_desc_tbl_from_registry (const char *tbl_name)
 {
     struct reg_tbl_item *l;
 
@@ -491,10 +488,9 @@ struct reg_desc_tbl *get_reg_desc_lkptbl (const char *tbl_name)
         return NULL;
     }
 
-    l = global_tbl_list;
+    l = reg_desc_tbl_registry;
     while (l) {
         if (0 == strncmp(l->tbl->n, tbl_name, strlen(l->tbl->n)+1)) {
-            printf("Found %s device reg tbl in the list.", l->tbl->n);
             return l->tbl;
         }
         l = l->next;
