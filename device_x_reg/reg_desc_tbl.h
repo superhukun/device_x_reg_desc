@@ -132,17 +132,17 @@ struct reg_desc_tbl *get_reg_desc_tbl_from_registry(const char *tbl_name);
 typedef void (*reg_desc_tbl_regitry_iterator)(const char *tbl_name, struct reg_desc_tbl *tbl, void *ctx);
 void iterate_reg_desc_tbl_registry(reg_desc_tbl_regitry_iterator iter, void *ctx);
 
-#define REG_DESC_TBL_REGISTRY(_n, _tbl, _prio ... ) \
-static struct reg_tbl_item reg_tbl_item_##_n; \
+#define REG_DESC_TBL_REGISTRY(_n, _tbl, _prio ... )                                   \
+static struct reg_tbl_item reg_tbl_item_##_n;                                         \
 static void do_registry_reg_desc_tbl_##_n (void) __attribute__((constructor(_prio))); \
-static void do_registry_reg_desc_tbl_##_n (void) \
-{ \
-    registry_reg_desc_tbl(&reg_tbl_item_##_n); \
-} \
-static struct reg_tbl_item reg_tbl_item_##_n = { \
-    .tbl_name = #_n, \
-    .tbl = &(_tbl), \
-    .next = NULL \
-} \
+static void do_registry_reg_desc_tbl_##_n (void)                                      \
+{                                                                                     \
+    registry_reg_desc_tbl(&reg_tbl_item_##_n);                                        \
+}                                                                                     \
+static struct reg_tbl_item reg_tbl_item_##_n = {                                      \
+    .tbl_name = #_n,                                                                  \
+    .tbl = &(_tbl),                                                                   \
+    .next = NULL,                                                                     \
+}                                                                                     \
 
 #endif

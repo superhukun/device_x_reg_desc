@@ -129,14 +129,15 @@
  */
 #define DEV(name, a, ...) struct dummy_for_reg_flds_##name {
 #define REG(name, a, ...) }; static struct reg_field _reg_fields_##name [] = {
-#define FLD(name, _msk, _abbr, _desc) \
-    { \
-           .n = #name, \
-           .abbr = #_abbr, \
-           .desc = _desc, \
-           .msk = _msk, \
-           .cnt = sizeof(_field_opts_##name)/sizeof(_field_opts_##name[0]), \
-           .opts = _field_opts_##name, \
+#define FLD(name, _msk, _abbr, _desc)            \
+    {                                            \
+           .n = #name,                           \
+           .abbr = #_abbr,                       \
+           .desc = _desc,                        \
+           .msk = _msk,                          \
+           .cnt = sizeof(_field_opts_##name)     \
+                 /sizeof(_field_opts_##name[0]), \
+           .opts = _field_opts_##name,           \
    },
 #define OPT(...)
 #define END_DEV(...) };
@@ -171,10 +172,10 @@
  *
  */
 #define DEV(name, a, ...) static struct reg_desc _regs_##name [] = {
-#define REG(name, _id, _abbr, _desc) \
-    { .n = #name, .abbr = #_abbr, .desc = _desc, .loc = _id, \
+#define REG(name, _id, _abbr, _desc)                                   \
+    { .n = #name, .abbr = #_abbr, .desc = _desc, .loc = _id,           \
       .cnt = sizeof(_reg_fields_##name)/sizeof(_reg_fields_##name[0]), \
-      .flds = _reg_fields_##name, \
+      .flds = _reg_fields_##name,                                      \
     },
 #define FLD(...)
 #define OPT(...)
@@ -211,12 +212,13 @@
  * Since the reg_desc_tbl chains reg_desc chains reg_field, other struct array instances still could be static.
  */
 #define _DEV_TBL(dev_name, tbl_name, _abbr, _desc) \
-    struct reg_desc_tbl tbl_name = { \
-        .n = #dev_name, \
-        .abbr = #_abbr, \
-        .desc = _desc, \
-        .cnt = sizeof(_regs_##dev_name)/sizeof(_regs_##dev_name[0]), \
-        .regs = _regs_##dev_name, \
+    struct reg_desc_tbl tbl_name = {               \
+        .n = #dev_name,                            \
+        .abbr = #_abbr,                            \
+        .desc = _desc,                             \
+        .cnt = sizeof(_regs_##dev_name)            \
+              /sizeof(_regs_##dev_name[0]),        \
+        .regs = _regs_##dev_name,                  \
     };
 #define DEV_TBL(dev_name, tbl_name, _abbr, _desc) _DEV_TBL(dev_name, tbl_name, _abbr, _desc)
 
