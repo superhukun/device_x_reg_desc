@@ -17,22 +17,12 @@
 /* One optional value of a register field.*/
 struct field_opt {
     desc_literal_info;
-#if 0
-    const char *n; /* name*/
-    const char *abbr; /* abbreviation*/
-    const char *desc;
-#endif
     uint32_t v;
 };
 
 /* One field of a register.*/
 struct reg_field {
     desc_literal_info;
-#if 0
-    const char *n;
-    const char *abbr;
-    const char *desc;
-#endif
     uint32_t msk; /*mask of this field.*/
     uint32_t cnt; /* count of optional values*/
     struct field_opt *opts;
@@ -66,12 +56,14 @@ enum parse_status {
     PARSE_LAST
 };
 
+/* Literal information level flags */
 #define INFO_L_NAME ((0x1) << 0)
 #define INFO_L_ABBR ((0x1) << 1)
 #define INFO_L_DESC ((0x1) << 2)
 #define INFO_L_ALL  ((0x7))
 typedef uint8_t literal_info_flg_t;
 
+/* Register parse Request and Result structure. */
 struct reg_parse_req_result {
     /*
      * buf
@@ -80,12 +72,18 @@ struct reg_parse_req_result {
      * */
     char *buf;
     uint32_t buf_size;
-    /*Control what kind of level info output to buf*/
+    /*
+     * Control what kind of level info output to buf.
+     * */
     literal_info_flg_t dev_info_flg;
     literal_info_flg_t reg_info_flg;
     literal_info_flg_t fld_info_flg;
     literal_info_flg_t opt_info_flg;
 
+    /*
+     * Pass out the parsing status, literal info
+     * when the callback is invoked or reg_desc_xxx() is returned.
+     * */
     enum parse_status progress;
     struct reg_desc_literal_info dev;
     struct reg_desc_literal_info reg;
@@ -97,17 +95,29 @@ struct reg_parse_req_result {
 
 typedef void (*output_decorator_cb)(struct reg_parse_req_result* res, void *ctx);
 
-/*reg_desc_tbl_dump is mainly for DEBUG.*/
-void reg_desc_tbl_dump(struct reg_desc_tbl *tbl,
-                       struct reg_parse_req_result *res,
-                       output_decorator_cb decorator,
-                       void *ctx);
-
+/*
+ * Function: Parse the value of register w/ specified register description table.
+ *
+ * reg_loc  : [IN] register location ID.
+ * reg_value: [IN] register value
+ * lkp_msk  : [IN] specify  the mask bits to lookup for this parse.
+ * tbl      : [IN] register description table to facilitate the parse.
+ *                 NULL is allowed, means no any table to provide literal info.
+ * res      : [IN | OUT] request and result for this parse. Refer to struct reg_parse_req_result.
+ * decorator: [IN & CALLBACKED] decorator callback. NULL is allowed.
+ * ctx      : [IN & PASS to decorator] decorator context. NULL is allowed.
+ * */
 void reg_desc_parse_reg_value(uint32_t reg_loc, uint32_t reg_value, uint32_t lkp_msk,
                               struct reg_desc_tbl *tbl,
                               struct reg_parse_req_result *res,
                               output_decorator_cb decorator,
                               void *ctx);
+
+/*reg_desc_tbl_dump is mainly for DEBUG.*/
+void reg_desc_tbl_dump(struct reg_desc_tbl *tbl,
+                       struct reg_parse_req_result *res,
+                       output_decorator_cb decorator,
+                       void *ctx);
 
 char *msk_to_str_msb (uint32_t msk);
 

@@ -4,6 +4,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 
 #include "reg_desc_tbl.h"
 
@@ -34,6 +35,8 @@ struct reg_parse_test_item test_cases [] = {
     {.reg_loc = 0x12345, .reg_value = 0xff23, .intested_msk = 0xff,   .tbl = "DEV_TEST", .cb = NULL },
     {.reg_loc = 0x12345, .reg_value = 0x5a5a, .intested_msk = 0xffff, .tbl = "DEV_TEST", .cb = NULL },
     {.reg_loc = 0x8877,  .reg_value = 0xa5a5, .intested_msk = 0xffff, .tbl = "DEV_TEST", .cb = NULL },
+    {.reg_loc = 0x12345, .reg_value = 0x5a5a, .intested_msk = 0xffff, .tbl = "DEV_TEST", .cb = test_decorator_cb},
+    {.reg_loc = 0x8877,  .reg_value = 0xa5a5, .intested_msk = 0xffff, .tbl = "DEV_TEST", .cb = test_decorator_cb},
 };
 
 static uint32_t masks[] = {
@@ -47,15 +50,16 @@ static uint32_t masks[] = {
     ~0x5a5a5a5a,
 };
 
-void test_msk_to_str_msb (void)
+static void test_msk_to_str_msb (void)
 {
     uint32_t i;
+    printf("| Mask HEX | MSB Bits Description |\n");
     for (i = 0; i < sizeof(masks)/sizeof(masks[0]); i++) {
-        printf("%#08x bits set:%s\n", masks[i], msk_to_str_msb(masks[i]));
+        printf("| 0X%08X | %10s | \n", masks[i], msk_to_str_msb(masks[i]));
     }
 }
 
-void test_reg_desc_tbl_parse (void)
+static void test_reg_desc_tbl_parse (void)
 {
     struct reg_parse_req_result result = {0};
     int i;
@@ -82,7 +86,7 @@ void test_reg_desc_tbl_parse (void)
     }
 }
 
-void test_reg_enum_ids (void)
+static void test_reg_enum_ids (void)
 {
     uint32_t regid;
     uint32_t value, msk;
@@ -109,13 +113,33 @@ void test_reg_enum_ids (void)
     printf("%s", buf);
 }
 
+static void show_usage (char *app)
+{
+    printf("%s [cmd]\n", app);
+    printf("cmd is one of the following:\n");
+    printf("\n");
+    printf("\ttest_msk          : do the test cases for converting mask value to string desc\n");
+    printf("\ttest_reg_enum     : do the test bases for register related(including fields, field optional values) enum IDs\n");
+    printf("\ttest_reg_vl_parse : do the test bases for register value parsing\n");
+}
+
 int main (int argc, char *argv[])
 {
-    //test_msk_to_str_msb();
+    if (argc > 1) {
+        if (0 == strncmp(argv[1], "test_msk", strlen("test_msk")+1)) {
+            test_msk_to_str_msb();
+        } else if (0 == strncmp(argv[1], "test_reg_enum", strlen("test_reg_enum")+1)) {
+            test_reg_enum_ids();
+        } else if (0 == strncmp(argv[1], "test_reg_vl_parse", strlen("test_reg_vl_parse")+1)) {
+            test_reg_desc_tbl_parse();
+        } else if (0 == strncmp(argv[1], "help", strlen("help")+1)) {
+            show_usage(argv[0]);
+        } else {
+            show_usage(argv[0]);
+        }
+        return 0;
+    }
 
-    //test_reg_desc_tbl_parse();
-    test_reg_enum_ids();
-
+    show_usage(argv[0]);
     return 0;
-
 }

@@ -7,15 +7,16 @@ CORE_OBJ = \
 TBL_PLUGGINS_OBJ = \
 		   $(OUTPUT_DIR)/device_x_reg_desc_tbl.o \
 
-APP_OBJ = \
-		   $(OUTPUT_DIR)/device_x_reg.o \
+APP1 = app_device_x_reg_test
+APP1_OBJ = \
+		   $(OUTPUT_DIR)/app_device_x_reg_test.o \
 
-all: $(OUTPUT_DIR)/reg_parse_no_tbl $(OUTPUT_DIR)/reg_parse_with_tbl
+all: $(OUTPUT_DIR)/$(APP1)_no_tbl $(OUTPUT_DIR)/$(APP1)_tbl
 
-$(OUTPUT_DIR)/reg_parse_no_tbl: $(CORE_OBJ) $(APP_OBJ)
+$(OUTPUT_DIR)/$(APP1)_no_tbl: $(CORE_OBJ) $(APP1_OBJ)
 	$(CC) -o $@ $^
 
-$(OUTPUT_DIR)/reg_parse_with_tbl: $(CORE_OBJ) $(APP_OBJ) $(TBL_PLUGGINS_OBJ)
+$(OUTPUT_DIR)/$(APP1)_tbl: $(CORE_OBJ) $(APP1_OBJ) $(TBL_PLUGGINS_OBJ)
 	$(CC) -o $@ $^
 
 $(OUTPUT_DIR)/%.o: %.c $(OUTPUT_DIR)
@@ -24,9 +25,11 @@ $(OUTPUT_DIR)/%.o: %.c $(OUTPUT_DIR)
 $(OUTPUT_DIR):
 	mkdir $(OUTPUT_DIR)
 
-E:
-	gcc -E -o device_x_reg.E device_x_reg.c
+dbg:
+	gcc -E -o ./$(OUTPUT_DIR)/device_x_reg.h.E device_x_reg.h
+	gcc -E -o ./$(OUTPUT_DIR)/device_x_reg_desc_tbl.c.E device_x_reg_desc_tbl.c
+
 clean:
-	rm -i $(OUTPUT_DIR)/*
+	rm -f ./$(OUTPUT_DIR)/*
 
 .PHONY : clean
