@@ -392,7 +392,7 @@ void reg_desc_parse_reg_value (uint32_t reg_loc, uint32_t reg_value, uint32_t lk
      */
     fld = reg->flds;
     for (fld_idx = 0; fld_idx < reg->cnt; fld_idx++, fld++) {
-        if (lkp_msk & fld->msk != fld->msk) {
+        if ((lkp_msk & fld->msk) != fld->msk) {
             /*It's not interested field, skip it*/
             continue;
         }
