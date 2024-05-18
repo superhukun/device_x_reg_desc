@@ -123,20 +123,24 @@ char *msk_to_str_msb (uint32_t msk);
 
 /*Registry related struct, MACRO */
 struct reg_tbl_item {
+    const char *tbl_name;
     struct reg_desc_tbl *tbl;
     struct reg_tbl_item *next;
 };
 void registry_reg_desc_tbl(struct reg_tbl_item *item);
 struct reg_desc_tbl *get_reg_desc_tbl_from_registry(const char *tbl_name);
+typedef void (*reg_desc_tbl_regitry_iterator)(const char *tbl_name, struct reg_desc_tbl *tbl, void *ctx);
+void iterate_reg_desc_tbl_registry(reg_desc_tbl_regitry_iterator iter, void *ctx);
 
-#define REG_DESC_TBL_REGISTRY(_tbl) \
-static struct reg_tbl_item reg_tbl_item_##_tbl; \
-static void do_registry_reg_desc_tbl_##_tbl (void) __attribute__((constructor)); \
-static void do_registry_reg_desc_tbl_##_tbl (void) \
+#define REG_DESC_TBL_REGISTRY(_n, _tbl, _prio ... ) \
+static struct reg_tbl_item reg_tbl_item_##_n; \
+static void do_registry_reg_desc_tbl_##_n (void) __attribute__((constructor(_prio))); \
+static void do_registry_reg_desc_tbl_##_n (void) \
 { \
-    registry_reg_desc_tbl(&reg_tbl_item_##_tbl); \
+    registry_reg_desc_tbl(&reg_tbl_item_##_n); \
 } \
-static struct reg_tbl_item reg_tbl_item_##_tbl = { \
+static struct reg_tbl_item reg_tbl_item_##_n = { \
+    .tbl_name = #_n, \
     .tbl = &(_tbl), \
     .next = NULL \
 } \

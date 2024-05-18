@@ -450,10 +450,11 @@ void reg_desc_parse_reg_value (uint32_t reg_loc, uint32_t reg_value, uint32_t lk
         /*This register's some fields are not defined in the table. */
         if (buf) {
             /* Output literal text to buf like:
-             * "Register (reg desc) undefined bits: 15-13\n"
+             * "Register 0x{reg_loc} (reg desc) undefined bit(s): 15-13\n"
              **/
             prn_rc = snprintf(buf, size,
-                    "Register (" LITERAL_INFO_FMT ") undefined bits: %s\n",
+                    "Register 0x%08x (" LITERAL_INFO_FMT ") undefined bit(s): %s\n",
+                    reg_loc,
                     LITERAL_INFO_ARG(res->reg_info_flg, reg),
                     msk_to_str_msb(fld_not_found_msk));
             SNPRNT_SANITY_UPDT(prn_rc, buf, size);
@@ -476,10 +477,9 @@ void registry_reg_desc_tbl (struct reg_tbl_item *list) {
         return;
     }
 
-    if (get_reg_desc_tbl_from_registry(list->tbl->n)) {
-        /*Duplicated name table already registry to list*/
+    if (get_reg_desc_tbl_from_registry(list->tbl_name)) {
+        /*Duplicated table name in registry table list*/
         return;
-
     }
 
     list->next = reg_desc_tbl_registry;
@@ -496,11 +496,26 @@ struct reg_desc_tbl *get_reg_desc_tbl_from_registry (const char *tbl_name)
 
     l = reg_desc_tbl_registry;
     while (l) {
-        if (0 == strncmp(l->tbl->n, tbl_name, strlen(l->tbl->n)+1)) {
+        if (0 == strncmp(l->tbl_name, tbl_name, strlen(l->tbl_name)+1)) {
             return l->tbl;
         }
         l = l->next;
     }
 
     return NULL;
+}
+
+void iterate_reg_desc_tbl_registry (reg_desc_tbl_regitry_iterator iter, void *ctx)
+{
+    struct reg_tbl_item *l;
+
+    if (NULL == iter) {
+        return;
+    }
+
+    l = reg_desc_tbl_registry;
+    while (l) {
+        iter(l->tbl_name, l->tbl, ctx);
+        l = l->next;
+    }
 }

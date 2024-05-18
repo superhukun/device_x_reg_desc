@@ -211,7 +211,7 @@
  * Since the reg_desc_tbl chains reg_desc chains reg_field, other struct array instances still could be static.
  */
 #define _DEV_TBL(dev_name, tbl_name, _abbr, _desc) \
-    struct reg_desc_tbl reg_desc_tbl_##tbl_name = { \
+    struct reg_desc_tbl tbl_name = { \
         .n = #dev_name, \
         .abbr = #_abbr, \
         .desc = _desc, \
@@ -225,25 +225,23 @@
  * is to have the extendibility to specify suffix for the table name.
  * Eg:
  *
- * if defined (DEV_REGS_TBL_NAME)
+ * #if defined (DEV_REGS_TBL_NAME)
  * #define DEV(name, _resv, _abbr, _desc) DEV_TBL(name, DEV_REGS_TBL_NAME, _abbr, _desc)
  * #endif
+ *
+ * NOTE:
+ * when DEV_REGS_TBL_NAME is defined, only one device is allowed in one reg_desc_*.reg file.
  * */
-#define DEV(name, _resv, _abbr, _desc) DEV_TBL(name, name, _abbr, _desc)
+#if defined (DEV_REGS_TBL_NAME)
+#define DEV(name, _resv, _abbr, _desc) DEV_TBL(name, DEV_REGS_TBL_NAME, _abbr, _desc)
+#else
+#define DEV(name, _resv, _abbr, _desc) DEV_TBL(name, reg_desc_tbl_##name, _abbr, _desc)
+#endif
 
 #define REG(...)
 #define FLD(...)
 #define OPT(...)
 #define END_DEV(...)
-
-#elif defined (SUBMIT_DEV_REGS_DESC_TBL)
-/*TODO: support register(submit) the tbl to a list */
-#undef DEV
-#undef REG
-#undef FLD
-#undef OPT
-#undef END_DEV
-
 
 #else
 #error The usage of reg_desc_hlper.h is not correct, one of reg_desc_hlper.h needed MACRO must be defined before include this file. Please contact the author of this file.

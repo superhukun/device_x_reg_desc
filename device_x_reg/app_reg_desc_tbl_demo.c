@@ -20,6 +20,8 @@ struct reg_value_lkp_cfg {
     literal_info_flg_t reg_info_flg;
     literal_info_flg_t fld_info_flg;
     literal_info_flg_t opt_info_flg;
+
+    uint32_t list_tbl:1;
 };
 
 static void show_usage (char *app)
@@ -44,6 +46,7 @@ static void show_usage (char *app)
     printf("                                     d: detail description of component\n");
     printf("                                     A: all, a, n, d\n");
     printf("--help | -h : Show this help information.\n");
+    printf("--list | -l : List all tables in the registry.\n");
     printf("\n");
 }
 
@@ -68,6 +71,7 @@ static void build_cfg_from_args (int argc, char *argv[], struct reg_value_lkp_cf
             {"val",           required_argument, 0,  'v' },
             {"msk",           required_argument, 0,  'm' },
             {"help",          no_argument,       0,  'h' },
+            {"list",          no_argument,       0,  'l' },
 
             {"dev_a_literal", no_argument,       0,  info_opt('d', 'a') },
             {"dev_n_literal", no_argument,       0,  info_opt('d', 'n') },
@@ -97,7 +101,7 @@ static void build_cfg_from_args (int argc, char *argv[], struct reg_value_lkp_cf
             {0,         0,                 0,  0 }
         };
 
-        c = getopt_long(argc, argv, "t:r:v:m:h",
+        c = getopt_long(argc, argv, "t:r:v:m:hl",
                 long_options, &option_index);
         if (c == -1)
             break;
@@ -193,6 +197,9 @@ static void build_cfg_from_args (int argc, char *argv[], struct reg_value_lkp_cf
                 cfg->opt_info_flg |= INFO_L_ALL;
                 break;
 
+            case 'l':
+                cfg->list_tbl = 1;
+                break;
             case '?':
                 show_usage(argv[0]);
                 exit(0);
@@ -205,6 +212,21 @@ static void build_cfg_from_args (int argc, char *argv[], struct reg_value_lkp_cf
         }
     }
 }
+
+static uint32_t tbl_cnt_in_registry = 0;
+void list_tbl_iterator (const char *tbl_name, struct reg_desc_tbl *tbl, void *ctx __attribute__((unused)))
+{
+    printf("Table[%d]: %s --> Device:%s\n", tbl_cnt_in_registry++, tbl_name, tbl->n);
+}
+static void  list_tables_in_registry (void)
+{
+    printf("Register desc table in registry:\n");
+    iterate_reg_desc_tbl_registry(list_tbl_iterator, NULL);
+    if (0 == tbl_cnt_in_registry) {
+        printf("No any table!!\n");
+    }
+}
+
 
 static void show_cfg (struct reg_value_lkp_cfg *cfg)
 {
@@ -229,7 +251,11 @@ int main (int argc, char *argv[])
 
     load_default_cfg(&cfg);
     build_cfg_from_args(argc, argv, &cfg);
-    show_cfg(&cfg);
+    //show_cfg(&cfg);
+    if (cfg.list_tbl) {
+        list_tables_in_registry();
+        exit(0);
+    }
 
     tbl = get_reg_desc_tbl_from_registry(cfg.tbl_name);
 
