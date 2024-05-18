@@ -50,7 +50,10 @@ static uint32_t l_value (uint32_t g_v, uint32_t g_msk)
         if (((0x1) << g_i) & g_msk) {
             l_v |= ((((0x1) << g_i) & g_v)? 1 : 0) << l_i;
             l_i++;
-            /*Clear handled bit from g_msk, when g_msk is zero then we don't need to continous. */
+            /*
+             * Clear handled bit from g_msk,
+             * when g_msk is zero then we don't need to continous.
+             */
             g_msk ^= ((0x1) << g_i);
         }
     }
@@ -195,20 +198,20 @@ char *msk_to_str_msb (uint32_t msk)
 
 #define ASSIGN_LITERAL_INFO(a, b) \
     do {                          \
-        (a)->n    = (b)->n;       \
         (a)->abbr = (b)->abbr;    \
+        (a)->n    = (b)->n;       \
         (a)->desc = (b)->desc;    \
     } while(0)                    \
 
 #define NONE_LITERAL_INFO(a) \
     do {                     \
-        (a)->n    = NULL;    \
         (a)->abbr = NULL;    \
+        (a)->n    = NULL;    \
         (a)->desc = NULL;    \
     } while(0)               \
 
 static char * parse_result_str[] = {
-    [PARSE_UNKNOWN] = "Unknown",
+    [PARSE_UNKNOWN] = "UNK",
     [PARSE_REGISTER_FOUND] = "RegFound",
     [PARSE_ONE_FLD_FOUND] = "FieldFound",
     [PARSE_ONE_FLD_OPT_FOUND] = "FieldOptFound",
@@ -232,17 +235,18 @@ char *reg_desc_parse_result_status_str (enum parse_status st) {
  * */
 #define LITERAL_INFO_FMT "%s%s%s%s%s%s"
 #define LITERAL_INFO_ARG(_flg,  _obj)                                      \
-    (_flg & INFO_L_ALL)?"":(_obj?(_obj)->abbr:"Unknown"),                  \
-    (_flg & INFO_L_NAME)?(_obj?(_obj)->n:"Unknown"):"",                    \
+    (_flg & INFO_L_ALL)?"":(_obj?(_obj)->abbr:"UNK"),                      \
+    (_flg & INFO_L_NAME)?(_obj?(_obj)->n:"UNK"):"",                        \
     ((_flg & INFO_L_NAME) && (_flg & (INFO_L_ABBR|INFO_L_DESC)))?" | ":"", \
-    (_flg & INFO_L_ABBR)?(_obj?(_obj)->abbr:"Unknown"):"",                 \
+    (_flg & INFO_L_ABBR)?(_obj?(_obj)->abbr:"UNK"):"",                     \
     ((_flg & INFO_L_ABBR) && (_flg & INFO_L_DESC))?" | ":"",               \
-    (_flg & INFO_L_DESC)?(_obj?(_obj)->desc:"Unknown"):""                  \
+    (_flg & INFO_L_DESC)?(_obj?(_obj)->desc:"UNK"):""                      \
 
 
-#define HEADLINE_PREFIX ""
-#define HEADLINE_NO_REG_LITERAL_FMT  HEADLINE_PREFIX LITERAL_INFO_FMT  "/0x%08X/0x%08x(lkp bits %s)\n"
-#define HEADLINE_FMT  HEADLINE_PREFIX "[Device:" LITERAL_INFO_FMT  "] /[Reg: 0x%08x " LITERAL_INFO_FMT "] /[Value: 0x%08x(lkp bits %s)]\n"
+#define HEADLINE_FMT            "[Device: " LITERAL_INFO_FMT  "] | [Reg: 0x%08x " LITERAL_INFO_FMT \
+                                 "] | [Value: 0x%08x (lookup mask bits %s)]\n"
+#define FLD_OPT_LINE_FMT        "(BIT %-5s FLD: " LITERAL_INFO_FMT ") : %d (" LITERAL_INFO_FMT ")\n"
+#define FLD_UNDEF_OPT_LINE_FMT  "(BIT %-5s FLD: " LITERAL_INFO_FMT ") : %d (Undef)\n"
 
 #define INVOKE_CALLB(_st, _cb, _res, _ctx) \
     do {                                   \
@@ -302,7 +306,7 @@ void reg_desc_parse_reg_value (uint32_t reg_loc, uint32_t reg_value, uint32_t lk
                                struct reg_parse_req_result *res,
                                output_decorator_cb decorator, void *cb_ctx)
 {
-    struct reg_desc *reg;
+    struct reg_desc *reg = NULL;
     char *buf;
     uint32_t size;
     uint32_t fld_not_found_msk = lkp_msk;
@@ -325,9 +329,11 @@ void reg_desc_parse_reg_value (uint32_t reg_loc, uint32_t reg_value, uint32_t lk
         /* No lkp table specified */
         if (buf) {
             prn_rc = snprintf(buf, size,
-                             HEADLINE_NO_REG_LITERAL_FMT,
+                             HEADLINE_FMT,
                              LITERAL_INFO_ARG(res->dev_info_flg, tbl),
-                             reg_loc, reg_value, msk_to_str_msb(lkp_msk));
+                             reg_loc,
+                             LITERAL_INFO_ARG(res->reg_info_flg, reg),
+                             reg_value, msk_to_str_msb(lkp_msk));
             SNPRNT_SANITY_UPDT(prn_rc, buf, size);
         }
         /* Set all literal info to empty. */
@@ -414,7 +420,7 @@ void reg_desc_parse_reg_value (uint32_t reg_loc, uint32_t reg_value, uint32_t lk
                  * */
                 if (buf) {
                     prn_rc = snprintf(buf, size,
-                            "(BIT %s:" LITERAL_INFO_FMT ") : %d(" LITERAL_INFO_FMT ")\n",
+                            FLD_OPT_LINE_FMT,
                             msk_to_str_msb(fld->msk),
                             LITERAL_INFO_ARG(res->fld_info_flg, fld),
                             l_value(fld_val, fld->msk),
@@ -430,7 +436,7 @@ void reg_desc_parse_reg_value (uint32_t reg_loc, uint32_t reg_value, uint32_t lk
         if (opt_idx >= fld->cnt) {
             /*Not find a matched field value option. */
             prn_rc = snprintf(buf, size,
-                    "(bit %s:" LITERAL_INFO_FMT ") : %d(Undef)\n",
+                    FLD_UNDEF_OPT_LINE_FMT,
                     msk_to_str_msb(fld->msk),
                     LITERAL_INFO_ARG(res->fld_info_flg, fld),
                     l_value(fld_val, fld->msk));

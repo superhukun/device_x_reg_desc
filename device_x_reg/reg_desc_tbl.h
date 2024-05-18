@@ -9,10 +9,10 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#define desc_literal_info \
-    const char *n; /* name*/ \
-    const char *abbr; /* abbreviation*/ \
-    const char *desc
+#define desc_literal_info                        \
+    const char *abbr; /* abbreviation/acronym */ \
+    const char *n;    /* name/normal info */     \
+    const char *desc  /* description/detail info */
 
 /* One optional value of a register field.*/
 struct field_opt {
