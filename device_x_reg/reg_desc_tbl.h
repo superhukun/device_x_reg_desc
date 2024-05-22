@@ -127,6 +127,7 @@ struct reg_tbl_item {
     struct reg_desc_tbl *tbl;
     struct reg_tbl_item *next;
 };
+char *reg_desc_parse_result_status_str(enum parse_status st);
 void registry_reg_desc_tbl(struct reg_tbl_item *item);
 struct reg_desc_tbl *get_reg_desc_tbl_from_registry(const char *tbl_name);
 typedef void (*reg_desc_tbl_regitry_iterator)(const char *tbl_name, struct reg_desc_tbl *tbl, void *ctx);

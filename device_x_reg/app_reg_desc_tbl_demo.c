@@ -22,6 +22,7 @@ struct reg_value_lkp_cfg {
     literal_info_flg_t opt_info_flg;
 
     uint32_t list_tbl:1;
+    uint32_t debug:1;
 };
 
 static void show_usage (char *app)
@@ -63,7 +64,6 @@ static void build_cfg_from_args (int argc, char *argv[], struct reg_value_lkp_cf
 {
     int c;
     while (1) {
-        int this_option_optind = optind ? optind : 1;
         int option_index = 0;
         static struct option long_options[] = {
             {"tbl",           required_argument, 0,  't' },
@@ -101,7 +101,7 @@ static void build_cfg_from_args (int argc, char *argv[], struct reg_value_lkp_cf
             {0,         0,                 0,  0 }
         };
 
-        c = getopt_long(argc, argv, "t:r:v:m:hl",
+        c = getopt_long(argc, argv, "t:r:v:m:hld",
                 long_options, &option_index);
         if (c == -1)
             break;
@@ -200,6 +200,9 @@ static void build_cfg_from_args (int argc, char *argv[], struct reg_value_lkp_cf
             case 'l':
                 cfg->list_tbl = 1;
                 break;
+            case 'd':
+                cfg->debug = 1;
+                break;
             case '?':
                 show_usage(argv[0]);
                 exit(0);
@@ -251,7 +254,9 @@ int main (int argc, char *argv[])
 
     load_default_cfg(&cfg);
     build_cfg_from_args(argc, argv, &cfg);
-    //show_cfg(&cfg);
+    if (cfg.debug) {
+        show_cfg(&cfg);
+    }
     if (cfg.list_tbl) {
         list_tables_in_registry();
         exit(0);

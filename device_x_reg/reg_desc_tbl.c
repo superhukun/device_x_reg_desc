@@ -312,7 +312,7 @@ void reg_desc_parse_reg_value (uint32_t reg_loc, uint32_t reg_value, uint32_t lk
     uint32_t fld_not_found_msk = lkp_msk;
     uint32_t fld_idx = 0;
     struct reg_field *fld;
-    uint32_t fld_msk, fld_val;
+    uint32_t fld_val;
     uint32_t opt_idx = 0;
     struct field_opt *opt;
     int prn_rc = 0;

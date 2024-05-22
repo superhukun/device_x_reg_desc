@@ -1,4 +1,4 @@
-CC = gcc
+CC = gcc -Wall -Werror
 OUTPUT_DIR = build
 
 CORE_OBJ = \
